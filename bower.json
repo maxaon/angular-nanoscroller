@@ -1,0 +1,28 @@
+{
+  "name": "angular-nanoscroller",
+  "main": "scrollable.js",
+  "version": "0.0.1",
+  "authors": [
+    "maxaon"
+  ],
+  "description": "Wrapper for [nanoScrollerJS](http://jamesflorentino.github.io/nanoScrollerJS/)",
+  "keywords": [
+    "angular",
+    "scroll",
+    "scroller",
+    "scrollbar",
+    "nanoscroller"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "nanoscroller": "~0.7.6",
+    "angular": "~1.2.7"
+  }
+}

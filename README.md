@@ -1,4 +1,4 @@
-angular-nanoscroller
-====================
+# Angular nanoScroller
 
-Wrapper for nanoScrollerJS
+
+Wrapper for [nanoScrollerJS](http://jamesflorentino.github.io/nanoScrollerJS/)
