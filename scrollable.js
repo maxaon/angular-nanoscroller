@@ -65,6 +65,8 @@
             $timeout($nanoElement.nanoScroller.bind($nanoElement, options));
           }
           else {
+            // Now watching only for height, watching collection will be added later
+            // http://jsperf.com/angular-watch-collection-vs-element-scroll-height
             scope.$watch( // Call nanoScroller, when height of content is changed
               function () {
                 return contentElement.scrollHeight;

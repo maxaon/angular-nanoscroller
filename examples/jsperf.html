@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>-->
+<div style="overflow: auto; height: 200px; width: 200px;">
+    <div id="content">
+        <p>Some content 1</p>
+
+        <p>Some content 2</p>
+
+        <p>Some content 3</p>
+
+        <p>Some content 4</p>
+
+        <p>Some content 5</p>
+
+        <p>Some content 6</p>
+
+        <p>Some content 7</p>
+
+        <p>Some content 8</p>
+
+        <p>Some content 9</p>
+
+        <p>Some content 10</p>
+
+        <p>Some content 11</p>
+
+        <p>Some content 12</p>
+
+        <p>Some content 13</p>
+
+        <p>Some content 14</p>
+
+        <p>Some content 15</p>
+
+        <p>Some content 16</p>
+
+        <p>Some content 17</p>
+
+        <p>Some content 18</p>
+
+        <p>Some content 19</p>
+
+        <p>Some content 20</p>
+
+        <p>Some content 21</p>
+
+        <p>Some content 22</p>
+
+        <p>Some content 23</p>
+
+        <p>Some content 24</p>
+
+        <p>Some content 25</p>
+
+        <p>Some content 26</p>
+
+        <p>Some content 27</p>
+
+        <p>Some content 28</p>
+
+        <p>Some content 29</p>
+
+        <p>Some content 30</p>
+    </div>
+</div>
+<script>
+var contentElement = document.getElementById("content");
+var watchFunctionByElement = function () {
+    return contentElement.scrollHeight;
+};
+
+var $watchCollectionArray = (function () {
+    var oldValue;
+    var newValue;
+    var changeDetected = 0;
+    var objGetter = function () {
+        return ["first", "second", "third", "bla"]
+    };
+    var internalArray = [];
+    var oldLength = 0;
+
+    function $watchCollectionWatch() {
+        newValue = objGetter();
+        var newLength;
+
+        if (oldValue !== internalArray) {
+            // we are transitioning from something which was not an array into array.
+            oldValue = internalArray;
+            oldLength = oldValue.length = 0;
+            changeDetected++;
+        }
+
+        newLength = newValue.length;
+
+        if (oldLength !== newLength) {
+            // if lengths do not match we need to trigger change notification
+            changeDetected++;
+            oldValue.length = oldLength = newLength;
+        }
+        // copy the items to oldValue and look for changes.
+        for (var i = 0; i < newLength; i++) {
+            if (oldValue[i] !== newValue[i]) {
+                changeDetected++;
+                oldValue[i] = newValue[i];
+            }
+        }
+        return changeDetected;
+    }
+
+    return $watchCollectionWatch;
+})();
+var $watchCollectionObject = (function () {
+    var oldValue;
+    var newValue;
+    var changeDetected = 0;
+    var objGetter = function () {
+        return {"first": "first", "second": "second", "third": "third", "bla": "bla"};
+    };
+    var internalObject = {};
+    var oldLength = 0;
+
+    function $watchCollectionWatch() {
+        newValue = objGetter();
+        var newLength, key;
+
+        if (oldValue !== internalObject) {
+            // we are transitioning from something which was not an object into object.
+            oldValue = internalObject = {};
+            oldLength = 0;
+            changeDetected++;
+        }
+        // copy the items to oldValue and look for changes.
+        newLength = 0;
+        for (key in newValue) {
+            if (newValue.hasOwnProperty(key)) {
+                newLength++;
+                if (oldValue.hasOwnProperty(key)) {
+                    if (oldValue[key] !== newValue[key]) {
+                        changeDetected++;
+                        oldValue[key] = newValue[key];
+                    }
+                } else {
+                    oldLength++;
+                    oldValue[key] = newValue[key];
+                    changeDetected++;
+                }
+            }
+        }
+        if (oldLength > newLength) {
+            // we used to have more keys, need to find them and destroy them.
+            changeDetected++;
+            for (key in oldValue) {
+                if (oldValue.hasOwnProperty(key) && !newValue.hasOwnProperty(key)) {
+                    oldLength--;
+                    delete oldValue[key];
+                }
+            }
+        }
+        return changeDetected;
+    }
+
+    return $watchCollectionWatch;
+})()
+
+
+</script>
+</body>
+</html>
