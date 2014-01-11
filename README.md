@@ -55,8 +55,13 @@ OR
 </div>
 ```
 
+### Additional attributes
+
 Using attribute `static` will disable automatic scrollbar reconfiguration
 when height of content is changed.
+
+Attributes `watch` and `watch-collection` will force nanoScroller updates only when objects are changed.
+To watch multiple objects separate it names throw `;` or `,`.
 
 ## Configuration
 To configure `scrollable` change constant `scrollableConfig`.

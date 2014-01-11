@@ -30,7 +30,12 @@
         </ul>
     </scrollable>
 </div>
-<div class="some-content" scrollable always-visible="true" static ng-model="items">
+<div class="some-content" scrollable always-visible="true" static>
+    <ul>
+        <li ng-repeat="item in items">{{item}}</li>
+    </ul>
+</div>
+<div class="some-content" scrollable always-visible="true" watch-collection="items">
     <ul>
         <li ng-repeat="item in items">{{item}}</li>
     </ul>

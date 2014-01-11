@@ -53,39 +53,62 @@
         priority: 1000,
         template: format(scrollableConfig.template, nanoScrollerDefaults),
         link: function (scope, element, attr) {
-          var contentElement = element.find('.' + nanoScrollerDefaults.contentClass)[0],
+          var oldHeight,
+            listener,
+            collectionListener,
+            contentElement = element.find('.' + nanoScrollerDefaults.contentClass)[0],
           // Find element with nano class including current
             $nanoElement = element.hasClass(nanoScrollerDefaults.nanoClass)
               ? element
               : element.find('.' + nanoScrollerDefaults.nanoClass),
             parentElement = contentElement.parentElement,
             options = angular.extend({}, nanoScrollerDefaults, convertStringToValue(attr), scope.$eval(attr['scrollable']));
+          listener = function (newHeight, oldHeight) {
+            // If this is first run, create nanoScroller
+            if (newHeight === oldHeight) {
+              $nanoElement.nanoScroller(options)
+            }
+            //If scroller was on the bottom, scroll to bottom
+            else if (newHeight !== oldHeight && contentElement.scrollTop &&
+              (oldHeight - contentElement.scrollTop - parentElement.clientHeight) < scrollableConfig.bottomMargin) {
+              $nanoElement.nanoScroller({scroll: 'bottom'});
+            }
+            // Otherwise just update the pane
+            else {
+              $nanoElement.nanoScroller();
+            }
+          };
           if ('static' in attr) {
             // Call scroller after transclusion
-            $timeout($nanoElement.nanoScroller.bind($nanoElement, options));
+            $timeout(listener);
           }
           else {
-            // Now watching only for height, watching collection will be added later
-            // http://jsperf.com/angular-watch-collection-vs-element-scroll-height
-            scope.$watch( // Call nanoScroller, when height of content is changed
-              function () {
-                return contentElement.scrollHeight;
-              },
-              function (newHeight, oldHeight) {
-                // If this is first run, create nanoScroller
-                if (newHeight === oldHeight) {
-                  $nanoElement.nanoScroller(options)
+            if (attr['watch'] || attr['watchCollection']) {
+              collectionListener = function () {
+                var newHeight = contentElement.scrollHeight;
+                if (oldHeight === undefined) {
+                  oldHeight = newHeight;
                 }
-                //If scroller was on the bottom, scroll to bottom
-                else if (newHeight !== oldHeight && contentElement.scrollTop &&
-                  (oldHeight - contentElement.scrollTop - parentElement.clientHeight) < scrollableConfig.bottomMargin) {
-                  $nanoElement.nanoScroller({scroll: 'bottom'});
-                }
-                // Otherwise just update the pane
-                else {
-                  $nanoElement.nanoScroller();
-                }
+                // Execution of listener must be delayed, because dom update will be later
+                $timeout(listener.bind(listener, newHeight, oldHeight));
+                console.log('upd')
+              }
+              attr['watch'] && angular.forEach(attr['watch'].replace(",", ";").split(";"), function (v) {
+                scope.$watch(v, collectionListener);
               });
+              attr['watchCollection'] && angular.forEach(attr['watchCollection'].replace(",", ";").split(";"), function (v) {
+                scope.$watchCollection(v, collectionListener);
+              });
+            }
+            else {
+              // Now watching only for height, watching collection will be added later
+              // http://jsperf.com/angular-watch-collection-vs-element-scroll-height
+              scope.$watch( // Call nanoScroller, when height of content is changed
+                function () {
+                  return contentElement.scrollHeight;
+                },
+                listener);
+            }
           }
           scope.$on("$destroy", function () {
             $nanoElement.nanoScroller({ destroy: true });
