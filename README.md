@@ -1,7 +1,8 @@
 # Angular nanoScroller
 
 Wrapper for [nanoScrollerJS](http://jamesflorentino.github.io/nanoScrollerJS/)
-with AngularJS lifecycle integration.
+with AngularJS lifecycle integration. 
+[Demo plunker](http://embed.plnkr.co/pnSkmuRc7HjXjMG0DdrT/preview)
 
 ## Installation
 
