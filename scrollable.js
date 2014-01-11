@@ -7,7 +7,7 @@
   if (angular.element !== $)
     throw new Error("Angular must use jQuery not jqLite");
 
-  const AS_ELEMENT = 1, AS_ATTRIBUTE = 0;
+  var AS_ELEMENT = 1, AS_ATTRIBUTE = 0;
   /**
    * Wrapper of nanoScrollerJS
    * @name sun.scrollable
@@ -23,7 +23,7 @@
    *
    */
   module.constant("scrollableConfig", {
-    template: '<div class="nano"><div class="content" ng-transclude></div></div>',
+    template: '<div class="{nanoClass}"><div class="{contentClass}" ng-transclude></div></div>',
     bottomMargin: 40
   });
 
@@ -32,6 +32,8 @@
    * @name nanoScrollerDefaults
    */
   module.constant("nanoScrollerDefaults", {
+    nanoClass: 'nano',
+    contentClass: 'content'
   });
   module.directive("scrollable", createScrollableDirective(AS_ELEMENT));
   module.directive("scrollable", createScrollableDirective(AS_ATTRIBUTE));
@@ -49,11 +51,13 @@
         replace: type === AS_ELEMENT,
         restrict: type === AS_ELEMENT ? 'E' : 'A',
         priority: 1000,
-        template: scrollableConfig.template,
+        template: format(scrollableConfig.template, nanoScrollerDefaults),
         link: function (scope, element, attr) {
-          var contentElement = element.find('.content')[0],
+          var contentElement = element.find('.' + nanoScrollerDefaults.contentClass)[0],
           // Find element with nano class including current
-            $nanoElement = element.hasClass('nano') ? element : element.find('.nano'),
+            $nanoElement = element.hasClass(nanoScrollerDefaults.nanoClass)
+              ? element
+              : element.find('.' + nanoScrollerDefaults.nanoClass),
             parentElement = contentElement.parentElement,
             options = angular.extend({}, nanoScrollerDefaults, convertStringToValue(attr), scope.$eval(attr['scrollable']));
           if ('static' in attr) {
@@ -119,6 +123,12 @@
       result[key] = value;
     });
     return result
+  }
+
+  function format(str, params) {
+    return str.replace(new RegExp("{.*?}", "g"), function (a) {
+      return params[a.slice(1, -1)] || "";
+    })
   }
 
 }(angular, jQuery));
