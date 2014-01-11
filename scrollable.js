@@ -54,16 +54,16 @@
         template: format(scrollableConfig.template, nanoScrollerDefaults),
         link: function (scope, element, attr) {
           var oldHeight,
-            listener,
-            collectionListener,
-            contentElement = element.find('.' + nanoScrollerDefaults.contentClass)[0],
-          // Find element with nano class including current
-            $nanoElement = element.hasClass(nanoScrollerDefaults.nanoClass)
-              ? element
-              : element.find('.' + nanoScrollerDefaults.nanoClass),
+            timerCancelCollection = angular.noop,
+            timerCancelStatic = angular.noop,
+            contentClass = nanoScrollerDefaults.contentClass,
+            nanoClass = nanoScrollerDefaults.nanoClass,
+            contentElement = element.find('.' + contentClass)[0],
             parentElement = contentElement.parentElement,
+            $nanoElement = element.hasClass(nanoClass) ? element : element.find('.' + nanoClass),
             options = angular.extend({}, nanoScrollerDefaults, convertStringToValue(attr), scope.$eval(attr['scrollable']));
-          listener = function (newHeight, oldHeight) {
+
+          function listener(newHeight, oldHeight) {
             // If this is first run, create nanoScroller
             if (newHeight === oldHeight) {
               $nanoElement.nanoScroller(options)
@@ -77,42 +77,43 @@
             else {
               $nanoElement.nanoScroller();
             }
-          };
+          }
+
+          function collectionListener() {
+            var newHeight = contentElement.scrollHeight;
+            if (oldHeight === undefined) {
+              oldHeight = newHeight;
+            }
+            // Execution of listener must be delayed, because DOM update will be later
+            timerCancelCollection = $timeout(listener.bind(listener, newHeight, oldHeight));
+          }
+
           if ('static' in attr) {
             // Call scroller after transclusion
-            $timeout(listener);
+            timerCancelStatic = $timeout(listener);
           }
+          else if (attr['watch'] || attr['watchCollection']) {
+            angular.forEach(splitter(attr['watch']), function (v) {
+              scope.$watch(v, collectionListener);
+            });
+            angular.forEach(splitter(attr['watchCollection']), function (v) {
+              scope.$watchCollection(v, collectionListener);
+            });
+          }
+          // If no watchers are supplied fall back to content element height check
           else {
-            if (attr['watch'] || attr['watchCollection']) {
-              collectionListener = function () {
-                var newHeight = contentElement.scrollHeight;
-                if (oldHeight === undefined) {
-                  oldHeight = newHeight;
-                }
-                // Execution of listener must be delayed, because dom update will be later
-                $timeout(listener.bind(listener, newHeight, oldHeight));
-                console.log('upd')
-              }
-              attr['watch'] && angular.forEach(attr['watch'].replace(",", ";").split(";"), function (v) {
-                scope.$watch(v, collectionListener);
-              });
-              attr['watchCollection'] && angular.forEach(attr['watchCollection'].replace(",", ";").split(";"), function (v) {
-                scope.$watchCollection(v, collectionListener);
-              });
-            }
-            else {
-              // Now watching only for height, watching collection will be added later
-              // http://jsperf.com/angular-watch-collection-vs-element-scroll-height
-              scope.$watch( // Call nanoScroller, when height of content is changed
-                function () {
-                  return contentElement.scrollHeight;
-                },
-                listener);
-            }
+            // http://jsperf.com/angular-watch-collection-vs-element-scroll-height
+            // Call nanoScroller, when height of content is changed
+            scope.$watch(function () {
+                return contentElement.scrollHeight;
+              },
+              listener);
           }
           scope.$on("$destroy", function () {
             $nanoElement.nanoScroller({ destroy: true });
             $nanoElement = contentElement = parentElement = null;
+            timerCancelCollection();
+            timerCancelStatic();
           })
         }
       };
@@ -150,9 +151,27 @@
     return result
   }
 
+  /**
+   * Split text in attribute by `,` or `;`
+   * @param val Attribute value
+   * @returns {Array} Array of name
+   */
+  function splitter(val) {
+    if (!val) {
+      return [];
+    }
+    return val.replace(",", ";").split(";");
+  }
+
+  /**
+   * Format `str` in python way (only dictionary)
+   * @param str Input string
+   * @param params Replacing variables
+   * @returns {String}
+   */
   function format(str, params) {
-    return str.replace(new RegExp("{.*?}", "g"), function (a) {
-      return params[a.slice(1, -1)] || "";
+    return str.replace(new RegExp("{.*?}", "g"), function (variable) {
+      return params[variable.slice(1, -1)] || "";
     })
   }
 
