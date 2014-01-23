@@ -75,3 +75,7 @@ To set default parameters of the nanoScroller modify constant `nanoScrollerDefau
 All parameters will be passed to nanoScroller during configuration stage.
 
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/maxaon/angular-nanoscroller/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
