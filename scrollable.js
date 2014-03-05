@@ -92,7 +92,7 @@
             // Call scroller after transclusion
             timerCancelStatic = $timeout(listener);
           }
-          else if (attr['watch'] || attr['watchCollection']) {
+          else if (typeof attr['watch'] === 'string' || attr['watchCollection']) {
             angular.forEach(splitter(attr['watch']), function (v) {
               scope.$watch(v, collectionListener);
             });
