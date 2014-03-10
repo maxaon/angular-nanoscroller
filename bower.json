@@ -1,7 +1,7 @@
 {
   "name": "angular-nanoscroller",
   "main": "scrollable.js",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "authors": [
     "maxaon"
   ],
@@ -22,7 +22,7 @@
     "tests"
   ],
   "dependencies": {
-    "nanoscroller": "~0.7.6",
-    "angular": "~1.2.7"
+    "nanoscroller": "~0.8.0",
+    "angular": "~1.2"
   }
 }

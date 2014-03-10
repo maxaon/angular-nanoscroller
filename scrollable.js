@@ -1,5 +1,4 @@
-;
-(function (angular, $, undefined) {
+;(function (angular, $, undefined) {
   'use strict';
   if ($.fn['nanoScroller'] === undefined)
     throw new Error("nanoScrollerJS is not defined in jQuery");
@@ -20,7 +19,6 @@
    * @param scrollableConfig.template Template of the scroller
    * @param scrollableConfig.bottomMargin Available number of pixels from the bottom,
    *        in which it is considered that scroller is in bottom
-   *
    */
   module.constant("scrollableConfig", {
     template: '<div class="{nanoClass}"><div class="{contentClass}" ng-transclude></div></div>',
@@ -33,7 +31,7 @@
    */
   module.constant("nanoScrollerDefaults", {
     nanoClass: 'nano',
-    contentClass: 'content'
+    contentClass: 'nano-content'
   });
   module.directive("scrollable", createScrollableDirective(AS_ELEMENT));
   module.directive("scrollable", createScrollableDirective(AS_ATTRIBUTE));
