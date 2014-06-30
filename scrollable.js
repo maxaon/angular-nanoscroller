@@ -1,4 +1,5 @@
-;(function (angular, $, undefined) {
+;
+(function (angular, $, undefined) {
   'use strict';
   if ($.fn['nanoScroller'] === undefined)
     throw new Error("nanoScrollerJS is not defined in jQuery");
@@ -21,7 +22,7 @@
    *        in which it is considered that scroller is in bottom
    */
   module.constant("scrollableConfig", {
-    template: '<div class="{nanoClass}"><div class="{contentClass}" ng-transclude></div></div>',
+    template    : '<div class="{nanoClass}"><div class="{contentClass}" ng-transclude></div></div>',
     bottomMargin: 40
   });
 
@@ -30,7 +31,7 @@
    * @name nanoScrollerDefaults
    */
   module.constant("nanoScrollerDefaults", {
-    nanoClass: 'nano',
+    nanoClass   : 'nano',
     contentClass: 'nano-content'
   });
   module.directive("scrollable", createScrollableDirective(AS_ELEMENT));
@@ -46,11 +47,11 @@
     var directive = function ($timeout, scrollableConfig, nanoScrollerDefaults) {
       return {
         transclude: true,
-        replace: type === AS_ELEMENT,
-        restrict: type === AS_ELEMENT ? 'E' : 'A',
-        priority: 1000,
-        template: format(scrollableConfig.template, nanoScrollerDefaults),
-        link: function (scope, element, attr) {
+        replace   : type === AS_ELEMENT,
+        restrict  : type === AS_ELEMENT ? 'E' : 'A',
+        priority  : 1000,
+        template  : format(scrollableConfig.template, nanoScrollerDefaults),
+        link      : function (scope, element, attr) {
           var oldHeight,
             timerCancelCollection = angular.noop,
             timerCancelStatic = angular.noop,
@@ -64,12 +65,22 @@
           function listener(newHeight, oldHeight) {
             // If this is first run, create nanoScroller
             if (newHeight === oldHeight) {
-              $nanoElement.nanoScroller(options)
+              // First run must be async
+              scope.$evalAsync(function () {
+                $nanoElement.nanoScroller(options);
+                $nanoElement.nanoScroller();
+              });
             }
             //If scroller was on the bottom, scroll to bottom
             else if (newHeight !== oldHeight && contentElement.scrollTop &&
               (oldHeight - contentElement.scrollTop - parentElement.clientHeight) < scrollableConfig.bottomMargin) {
-              $nanoElement.nanoScroller({scroll: 'bottom'});
+              scope.$evalAsync(function () {
+                // To make right calculation scroller must be reseted
+                // See https://github.com/maxaon/angular-nanoscroller/issues/4
+                $nanoElement.nanoScroller();
+                $nanoElement.nanoScroller({scroll: 'bottom'});
+              });
+
             }
             // Otherwise just update the pane
             else {
@@ -82,20 +93,19 @@
             if (oldHeight === undefined) {
               oldHeight = newHeight;
             }
-            // Execution of listener must be delayed, because DOM update will be later
-            timerCancelCollection = $timeout(listener.bind(listener, newHeight, oldHeight));
+            timerCancelCollection = listener(newHeight, oldHeight);
           }
 
-          if ('static' in attr) {
+          if (attr['static']) {
             // Call scroller after transclusion
-            timerCancelStatic = $timeout(listener);
+            timerCancelStatic = listener();
           }
           else if (typeof attr['watch'] === 'string' || attr['watchCollection']) {
-            angular.forEach(splitter(attr['watch']), function (v) {
-              scope.$watch(v, collectionListener);
+            angular.forEach(splitter(attr['watch']), function (name) {
+              scope.$watch(name, collectionListener);
             });
-            angular.forEach(splitter(attr['watchCollection']), function (v) {
-              scope.$watchCollection(v, collectionListener);
+            angular.forEach(splitter(attr['watchCollection']), function (name) {
+              scope.$watchCollection(name, collectionListener);
             });
           }
           // If no watchers are supplied fall back to content element height check
@@ -112,7 +122,7 @@
             $nanoElement = contentElement = parentElement = null;
             timerCancelCollection();
             timerCancelStatic();
-          })
+          });
         }
       };
     };
@@ -146,7 +156,7 @@
       }
       result[key] = value;
     });
-    return result
+    return result;
   }
 
   /**
