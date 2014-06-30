@@ -1,11 +1,13 @@
 ;
 (function (angular, $, undefined) {
   'use strict';
-  if ($.fn['nanoScroller'] === undefined)
+  if ($.fn['nanoScroller'] === undefined) {
     throw new Error("nanoScrollerJS is not defined in jQuery");
+  }
   //jQuery must be used, cause angular method 'find' has different behavior
-  if (angular.element !== $)
+  if (angular.element !== $) {
     throw new Error("Angular must use jQuery not jqLite");
+  }
 
   var AS_ELEMENT = 1, AS_ATTRIBUTE = 0;
   /**
@@ -53,8 +55,6 @@
         template  : format(scrollableConfig.template, nanoScrollerDefaults),
         link      : function (scope, element, attr) {
           var oldHeight,
-            timerCancelCollection = angular.noop,
-            timerCancelStatic = angular.noop,
             contentClass = nanoScrollerDefaults.contentClass,
             nanoClass = nanoScrollerDefaults.nanoClass,
             contentElement = element.find('.' + contentClass)[0],
@@ -93,12 +93,12 @@
             if (oldHeight === undefined) {
               oldHeight = newHeight;
             }
-            timerCancelCollection = listener(newHeight, oldHeight);
+            listener(newHeight, oldHeight);
           }
 
           if (attr['static']) {
             // Call scroller after transclusion
-            timerCancelStatic = listener();
+            listener();
           }
           else if (typeof attr['watch'] === 'string' || attr['watchCollection']) {
             angular.forEach(splitter(attr['watch']), function (name) {
@@ -120,8 +120,6 @@
           scope.$on("$destroy", function () {
             $nanoElement.nanoScroller({ destroy: true });
             $nanoElement = contentElement = parentElement = null;
-            timerCancelCollection();
-            timerCancelStatic();
           });
         }
       };
@@ -139,8 +137,9 @@
   function convertStringToValue(attr) {
     var result = {};
     angular.forEach(attr, function (value, key) {
-      if (key.indexOf("$") === 0)
+      if (key.indexOf("$") === 0) {
         return;
+      }
       switch (key) {
         case "true":
           value = true;
@@ -180,7 +179,7 @@
   function format(str, params) {
     return str.replace(new RegExp("{.*?}", "g"), function (variable) {
       return params[variable.slice(1, -1)] || "";
-    })
+    });
   }
 
 }(angular, jQuery));
