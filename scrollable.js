@@ -62,6 +62,10 @@
             $nanoElement = element.hasClass(nanoClass) ? element : element.find('.' + nanoClass),
             options = angular.extend({}, nanoScrollerDefaults, convertStringToValue(attr), scope.$eval(attr['scrollable']));
 
+          //Bindings for scrollend and scrolltop events
+          if(attr.scrollend) element.bind('scrollend', function () { scope.$apply(attr.scrollend); });          
+          if(attr.scrolltop) element.bind('scrolltop', function () { scope.$apply(attr.scrolltop); });
+
           function listener(newHeight, oldHeight) {
             // If this is first run, create nanoScroller
             if (newHeight === oldHeight) {
@@ -78,7 +82,8 @@
                 // To make right calculation scroller must be reseted
                 // See https://github.com/maxaon/angular-nanoscroller/issues/4
                 $nanoElement.nanoScroller();
-                $nanoElement.nanoScroller({scroll: 'bottom'});
+                // Below line comented to avoid double triggering 'scrollend' event
+                //$nanoElement.nanoScroller({scroll: 'bottom'});
               });
 
             }
