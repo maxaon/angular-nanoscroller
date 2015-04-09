@@ -65,7 +65,7 @@
           function listener(newHeight, oldHeight) {
             // If this is first run, create nanoScroller
             if (newHeight === oldHeight) {
-              // First run must be async by using $timeout instead of $scope.eval for prevent excuting $digest twice
+              // First run must be async by using $timeout instead of $scope.evalAsync for prevent executing $digest twice
               $timeout(function () {
                 $nanoElement.nanoScroller(options);
                 $nanoElement.nanoScroller();
