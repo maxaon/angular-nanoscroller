@@ -65,21 +65,21 @@
           function listener(newHeight, oldHeight) {
             // If this is first run, create nanoScroller
             if (newHeight === oldHeight) {
-              // First run must be async
-              scope.$evalAsync(function () {
+              // First run must be async by using $timeout instead of $scope.eval for prevent excuting $digest twice
+              $timeout(function () {
                 $nanoElement.nanoScroller(options);
                 $nanoElement.nanoScroller();
-              });
+              }, 0, false);
             }
             //If scroller was on the bottom, scroll to bottom
             else if (newHeight !== oldHeight && contentElement.scrollTop &&
               (oldHeight - contentElement.scrollTop - parentElement.clientHeight) < scrollableConfig.bottomMargin) {
-              scope.$evalAsync(function () {
+                $timeout(function () {
                 // To make right calculation scroller must be reseted
                 // See https://github.com/maxaon/angular-nanoscroller/issues/4
                 $nanoElement.nanoScroller();
                 $nanoElement.nanoScroller({scroll: 'bottom'});
-              });
+              }, 0, false);
 
             }
             // Otherwise just update the pane
