@@ -63,6 +63,8 @@
             options = angular.extend({}, nanoScrollerDefaults, convertStringToValue(attr), scope.$eval(attr['scrollable']));
 
           function listener(newHeight, oldHeight) {
+            if (!$nanoElement){ return; }
+              
             // If this is first run, create nanoScroller
             if (newHeight === oldHeight) {
               // First run must be async by using $timeout instead of $scope.evalAsync for prevent executing $digest twice
