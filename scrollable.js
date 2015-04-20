@@ -63,14 +63,14 @@
             options = angular.extend({}, nanoScrollerDefaults, convertStringToValue(attr), scope.$eval(attr['scrollable']));
 
           function listener(newHeight, oldHeight) {
-            if (!$nanoElement){ return; }
-              
             // If this is first run, create nanoScroller
             if (newHeight === oldHeight) {
               // First run must be async by using $timeout instead of $scope.evalAsync for prevent executing $digest twice
               $timeout(function () {
-                $nanoElement.nanoScroller(options);
-                $nanoElement.nanoScroller();
+                if ($nanoElement) {
+                    $nanoElement.nanoScroller(options);
+                    $nanoElement.nanoScroller();
+                }
               }, 0, false);
             }
             //If scroller was on the bottom, scroll to bottom
@@ -79,8 +79,10 @@
                 $timeout(function () {
                 // To make right calculation scroller must be reseted
                 // See https://github.com/maxaon/angular-nanoscroller/issues/4
-                $nanoElement.nanoScroller();
-                $nanoElement.nanoScroller({scroll: 'bottom'});
+                if ($nanoElement) {
+                    $nanoElement.nanoScroller();
+                    $nanoElement.nanoScroller({scroll: 'bottom'});
+                }
               }, 0, false);
 
             }
