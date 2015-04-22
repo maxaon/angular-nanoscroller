@@ -104,13 +104,17 @@
             // Call scroller after transclusion
             listener();
           }
-          else if (typeof attr['watch'] === 'string' || attr['watchCollection']) {
-            angular.forEach(splitter(attr['watch']), function (name) {
-              scope.$watch(name, collectionListener);
-            });
-            angular.forEach(splitter(attr['watchCollection']), function (name) {
-              scope.$watchCollection(name, collectionListener);
-            });
+          else if (attr['watch'] || attr['watchCollection']) {
+            if (typeof attr['watch'] === 'string' ){
+              angular.forEach(splitter(attr['watch']), function (name) {
+                scope.$watch(name, collectionListener);
+              });
+            }
+            if (typeof attr['watchCollection'] === 'string' ) {
+              angular.forEach(splitter(attr['watchCollection']), function (name) {
+                scope.$watchCollection(name, collectionListener);
+              });
+            }
           }
           // If no watchers are supplied fall back to content element height check
           else {
