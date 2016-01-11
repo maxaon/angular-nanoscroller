@@ -23,6 +23,6 @@
   ],
   "dependencies": {
     "nanoscroller": "~0.8.0",
-    "angular": "~1.2"
+    "angular": "1.2 - 1.4"
   }
 }
