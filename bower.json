@@ -1,6 +1,6 @@
 {
   "name": "angular-nanoscroller2",
-  "directory": "angular-nanoscroller"
+  "directory": "angular-nanoscroller",
   "main": "scrollable.js",
   "version": "0.2.1",
   "authors": [
