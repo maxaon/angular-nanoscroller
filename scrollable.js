@@ -65,21 +65,25 @@
           function listener(newHeight, oldHeight) {
             // If this is first run, create nanoScroller
             if (newHeight === oldHeight) {
-              // First run must be async
-              scope.$evalAsync(function () {
-                $nanoElement.nanoScroller(options);
-                $nanoElement.nanoScroller();
-              });
+              // First run must be async by using $timeout instead of $scope.evalAsync for prevent executing $digest twice
+              $timeout(function () {
+                if ($nanoElement) {
+                    $nanoElement.nanoScroller(options);
+                    $nanoElement.nanoScroller();
+                }
+              }, 0, false);
             }
             //If scroller was on the bottom, scroll to bottom
             else if (newHeight !== oldHeight && contentElement.scrollTop &&
               (oldHeight - contentElement.scrollTop - parentElement.clientHeight) < scrollableConfig.bottomMargin) {
-              scope.$evalAsync(function () {
+                $timeout(function () {
                 // To make right calculation scroller must be reseted
                 // See https://github.com/maxaon/angular-nanoscroller/issues/4
-                $nanoElement.nanoScroller();
-                $nanoElement.nanoScroller({scroll: 'bottom'});
-              });
+                if ($nanoElement) {
+                    $nanoElement.nanoScroller();
+                    $nanoElement.nanoScroller({scroll: 'bottom'});
+                }
+              }, 0, false);
 
             }
             // Otherwise just update the pane
@@ -100,13 +104,17 @@
             // Call scroller after transclusion
             listener();
           }
-          else if (typeof attr['watch'] === 'string' || attr['watchCollection']) {
-            angular.forEach(splitter(attr['watch']), function (name) {
-              scope.$watch(name, collectionListener);
-            });
-            angular.forEach(splitter(attr['watchCollection']), function (name) {
-              scope.$watchCollection(name, collectionListener);
-            });
+          else if (attr['watch'] || attr['watchCollection']) {
+            if (typeof attr['watch'] === 'string' ){
+              angular.forEach(splitter(attr['watch']), function (name) {
+                scope.$watch(name, collectionListener);
+              });
+            }
+            if (typeof attr['watchCollection'] === 'string' ) {
+              angular.forEach(splitter(attr['watchCollection']), function (name) {
+                scope.$watchCollection(name, collectionListener);
+              });
+            }
           }
           // If no watchers are supplied fall back to content element height check
           else {

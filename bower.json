@@ -22,7 +22,7 @@
     "tests"
   ],
   "dependencies": {
-    "nanoscroller": "~0.8.0",
-    "angular": "~1.2"
+    "nanoscroller": "~0.8.5",
+    "angular": "~1.3"
   }
 }
