@@ -140,6 +140,9 @@
       if (key.indexOf("$") === 0) {
         return;
       }
+      if (key == 'iosNativeScrolling') {
+        key = 'iOSNativeScrolling';
+      }
       switch (key) {
         case "true":
           value = true;
